@@ -1,0 +1,44 @@
+html, body, h1, h2, h3, h4, p, ul{
+  padding: 0;
+  margin: 0;
+}
+ul {
+  list-style: none;
+}
+html,
+body {
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+body {
+  background-color: rgba(200, 200, 200, 0.1);
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.mini-scrollbar::-webkit-scrollbar {
+  max-width: 8px;
+  height: max-content;
+}
+.mini-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  border-radius: 20px;
+}
+.mini-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.vjs-loading-spinner, .vjs-big-play-button, .vjs-error-display, .vjs-modal-dialog {
+  display: none;
+}
+
+.vjs-text-track-display div{
+  margin: 0 !important;
+}
