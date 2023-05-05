@@ -19,7 +19,7 @@ export default function PlayVideo() {
     playbackRate: '1', // 倍速播放 0.25 0.5 0.75 1 1.25 1.5
     captionSize: '1', // 字幕大小 0.5 1 1.5 
   })
-  const { ContentCard } = useTranslate()
+  const { ContentCard, fetchTranslate } = useTranslate(playState)
   interface CaptionProp {
     origin: string
     translate: string
@@ -87,6 +87,13 @@ export default function PlayVideo() {
     }
   }, [])
   useEffect(() => {
+    if (currentTime !== 0) {
+      getEngSubtitle(currentTime)
+    }
+  }, [currentTime])
+  
+
+  useEffect(() => {
     if (!player) return
     registerVideoEvent(player)
   }, [player])
@@ -129,7 +136,6 @@ export default function PlayVideo() {
       if (duration === 0) {
         setDuration(_duration)
       }
-      getEngSubtitle(currentTime)
     })
   }
   function play(e: any) {
@@ -198,6 +204,7 @@ export default function PlayVideo() {
         ...currentCaption,
         popVisibleList: currentCaption.popVisibleList.map((_, itemIndex) => itemIndex === index)
       })
+      fetchTranslate(word)
     }
   }
   function handleCaptionType(captionType: string | string[]) {
