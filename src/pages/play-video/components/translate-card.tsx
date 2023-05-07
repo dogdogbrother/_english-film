@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Loading } from '@geist-ui/core'
-import { VolumeNotice } from '@icon-park/react'
+import { VolumeNotice, Star } from '@icon-park/react'
 
 export default function TranslateCard() {
   return <div>123</div>
@@ -56,7 +56,7 @@ export function useTranslate(playState: boolean) {
             alignItems: "center"
           }}>
             <h4 css={{fontSize: '20px'}}>{translateRes.word}</h4>
-            <span>加入收藏</span>
+            <Star css={{cursor: 'pointer'}} theme="outline" size="24" fill="#333" strokeWidth={2}/>
           </div>
           <div css={{
             display: "flex",
