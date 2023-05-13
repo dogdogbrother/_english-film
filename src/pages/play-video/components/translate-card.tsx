@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Loading } from '@geist-ui/core'
 import { VolumeNotice, Star } from '@icon-park/react'
-import { getWordTranslate } from '../../../api/word'
+import { getWordTranslate } from '@/api/word'
 
 export default function TranslateCard() {
   return <div>123</div>

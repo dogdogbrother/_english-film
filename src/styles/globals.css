@@ -42,3 +42,6 @@ body::-webkit-scrollbar {
 .vjs-text-track-display div{
   margin: 0 !important;
 }
+.login-dialog {
+  transform: translateY(-10vh) !important;
+}

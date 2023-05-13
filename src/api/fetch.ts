@@ -1,10 +1,9 @@
 import queryString, { StringifiableRecord } from 'query-string'
-import { useToasts } from '@geist-ui/core'
+import { toast } from 'react-toastify';
 
 function getToken() {
   return localStorage.getItem('token')
 }
-
 interface FetchProp {
   url: string,
   query?: StringifiableRecord
@@ -21,14 +20,10 @@ export function useGetFetch<ResProp = any>(config: FetchProp) {
     const { status } = res
     if (status >= 200 && status < 300) {
       return res.json() as ResProp
+    } else if (status === 401) {
+      toast('123')
     } else {
-      const { setToast } = useToasts()
-      setToast({
-        text: '网络错误',
-        type: 'error',
-      })
       return Promise.reject(res)
-
     }
   })
 }
