@@ -30,12 +30,14 @@ export default function Film() {
     setDrawerState(false)
   }
   function toPlayVideo() {
-    // play-video
     navigate('/play-video')
 
   }
   return <div>
-    <ul>
+    <ul css={{
+      display: 'flex',
+      flexWrap: 'wrap'
+    }}>
       <li onClick={openDrawer} css={{cursor: 'pointer'}}>
         <Image src='/TheTrumanShow/index.png' />
         <h3>楚门的世界 TheTrumanShow</h3>

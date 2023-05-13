@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Loading } from '@geist-ui/core'
 import { VolumeNotice, Star } from '@icon-park/react'
+import { getWordTranslate } from '../../../api/word'
 
 export default function TranslateCard() {
   return <div>123</div>
@@ -15,8 +16,7 @@ export function useTranslate(playState: boolean) {
   function fetchTranslate(word: string) {
     if (!playState) {
       setLoading(true)
-      fetch(`/api/word/translate/${word}`).then(res => res.json()).then(res => {
-        console.log(res);
+      getWordTranslate(word).then(res => {
         const { explains, web, ...data } = res.data
         setTranslateRes({
           explains: JSON.parse(explains),
@@ -28,10 +28,7 @@ export function useTranslate(playState: boolean) {
           web: JSON.parse(web),
           ...data
         });
-        
-      }).finally(() => {
-        setLoading(false)
-      })
+      }).finally(() => setLoading(false))
     }
   }
   // 发音

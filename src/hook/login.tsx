@@ -1,11 +1,13 @@
 import { useModal, Modal, Input, Button, useToasts } from '@geist-ui/core'
 import { useState } from 'react'
-import { login } from '../../../api/user'
+import { login } from '../api/user'
+
 interface InputProp {
   value: string
   type?: 'error'
 }
-export default function Header() {
+
+export function useLogin() {
   const { setToast } = useToasts()
   const { visible, setVisible, bindings } = useModal()
   const [username, setUsername] = useState<InputProp>({
@@ -16,8 +18,6 @@ export default function Header() {
     value: '',
     type: undefined,
   })
-  const [loading, setLoading] = useState(false)
-  
   function handleLogin() {
     if (username.value.length < 4) {
       setUsername({...username, type: 'error'})
@@ -37,23 +37,20 @@ export default function Header() {
       localStorage.setItem("token", token)
     })
   }
+  const [loading, setLoading] = useState(false)
   function inputUsername(e: any) {
     setUsername({...username, value: e.target.value, type: e.target.value.length < 4 ? 'error' : undefined})
   }
   function inputPassword(e: any) {
     setPassword({...password, value: e.target.value, type: e.target.value.length < 4 ? 'error' : undefined})
   }
-  return <div css={{
-    height: '50px'
-  }}>
-    <div css={{cursor: 'pointer'}} onClick={() => setVisible(true)}>登录</div>
-    <Modal wrapClassName="login-dialog" {...bindings}>
-      <div css={{width: '200px', margin: '0 auto'}}>
-        <Input width="100%" type={username.type} placeholder='请输入用户名' css={{marginBottom: '20px', display: 'block'}} onChange={inputUsername} />
-        <Input.Password  type={username.type} placeholder='请输入密码' css={{marginBottom: '10px'}} onChange={inputPassword} />
-        <p css={{fontSize: '12px', color: '#888', marginBottom: '10px'}}>初次登录即为注册</p>
-        <Button type="secondary" ghost width="100%" onClick={handleLogin}>登录</Button>
-      </div>
-    </Modal>
-  </div>
+  const LoginModal = <Modal wrapClassName="login-dialog" {...bindings}>
+    <div css={{width: '200px', margin: '0 auto'}}>
+      <Input width="100%" type={username.type} placeholder='请输入用户名' css={{marginBottom: '20px', display: 'block'}} onChange={inputUsername} />
+      <Input.Password  type={username.type} placeholder='请输入密码' css={{marginBottom: '10px'}} onChange={inputPassword} />
+      <p css={{fontSize: '12px', color: '#888', marginBottom: '10px'}}>初次登录即为注册</p>
+      <Button type="secondary" ghost width="100%" onClick={handleLogin}>登录</Button>
+    </div>
+  </Modal>
+
 }

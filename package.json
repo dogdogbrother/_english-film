@@ -13,6 +13,7 @@
     "@emotion/react": "^11.10.8",
     "@geist-ui/core": "^2.3.8",
     "@icon-park/react": "^1.4.2",
+    "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.0",
