@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Loading } from '@geist-ui/core'
 import { VolumeNotice, Star } from '@icon-park/react'
-import { getWordTranslate } from '@/api/word'
+import { getWordTranslate, addCollect } from '@/api/word'
 
 export default function TranslateCard() {
   return <div>123</div>
@@ -12,34 +12,41 @@ export default function TranslateCard() {
  */
 export function useTranslate(playState: boolean) {
   const [loading, setLoading] = useState(false)
-  const [ translateRes, setTranslateRes ] = useState<any>()
-  function fetchTranslate(word: string) {
+  const [translateRes, setTranslateRes] = useState<any>()
+  const [word, setWord] = useState<string | undefined>()  // 本来的word
+  function fetchTranslate(_word: string) {
     if (!playState) {
+      setWord(_word)
       setLoading(true)
-      getWordTranslate(word).then(res => {
-        const { explains, web, ...data } = res.data
+      getWordTranslate(_word).then(res => {
+        const { explains, web, ...data } = res
         setTranslateRes({
-          explains: JSON.parse(explains),
-          web: JSON.parse(web),
+          explains,
+          web,
           ...data
         })
-        console.log({
-          explains: JSON.parse(explains),
-          web: JSON.parse(web),
-          ...data
-        });
       }).finally(() => setLoading(false))
     }
   }
   // 发音
   function playPhonetic(speech: string) {
-    
+    const audio = new Audio(speech)
+    audio.play()
+  }
+  function oncollect() {
+    addCollect({
+      word: word as string,
+      filmId: '1', // 虚假的电影id
+      keyWord: translateRes.word
+    }).then(res => console.log(res))
+    // word
+    // translateRes.word
   }
   function contentCard() {
     return <div css={{
-      padding: '5px 20px',
+      padding: '5px 15px',
       backgroundColor: '#fff',
-      width: '300px'
+      width: '340px'
     }}>
       {
         loading
@@ -50,27 +57,32 @@ export function useTranslate(playState: boolean) {
           <div css={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center"
+            alignItems: "center",
+            marginBottom: '10px'
           }}>
             <h4 css={{fontSize: '20px'}}>{translateRes.word}</h4>
-            <Star css={{cursor: 'pointer'}} theme="outline" size="24" fill="#333" strokeWidth={2}/>
+            {/* filled */}
+            <Star onClick={oncollect} css={{cursor: 'pointer', transform: 'translateY(2px)'}} theme="outline" size="24" fill="#333" strokeWidth={2}/>
           </div>
           <div css={{
             display: "flex",
             alignItems: "center"
           }}>
-            <div css={{
-              display: "flex",
-              alignItems: "center",
-              marginRight: '10px',
-              '> *': {
-                marginRight: '5px'
-              }
-            }}>
-              <span>英</span>
-              <span>/{translateRes.ukPhonetic}/</span>
-              <VolumeNotice onClick={() => playPhonetic(translateRes.ukSpeech)} css={{cursor: 'pointer'}} theme="outline" size="20" fill="#333" strokeWidth={2}/>
-            </div>
+            {
+              translateRes.ukPhonetic && (<div css={{
+                display: "flex",
+                alignItems: "center",
+                marginRight: '10px',
+                '> *': {
+                  marginRight: '5px'
+                }
+              }}>
+                <span>英</span>
+                <span>/{translateRes.ukPhonetic}/</span>
+                <VolumeNotice  onClick={() => playPhonetic(translateRes.ukSpeech)} css={{cursor: 'pointer', transform: 'translateY(3px)'}} theme="outline" size="20" fill="#333" strokeWidth={2}/>
+              </div>)
+            }
+            
             <div css={{
               display: "flex",
               alignItems: "center",
@@ -80,7 +92,7 @@ export function useTranslate(playState: boolean) {
             }}>
               <span>美</span>
               <span>/{translateRes.usPhonetic}/</span>
-              <VolumeNotice onClick={() => playPhonetic(translateRes.usSpeech)} css={{cursor: 'pointer'}} theme="outline" size="20" fill="#333" strokeWidth={2}/>
+              <VolumeNotice onClick={() => playPhonetic(translateRes.usSpeech)} css={{cursor: 'pointer', transform: 'translateY(3px)'}} theme="outline" size="20" fill="#333" strokeWidth={2}/>
             </div>
           </div>
         </div>

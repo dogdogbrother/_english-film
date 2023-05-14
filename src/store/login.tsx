@@ -1,5 +1,6 @@
 import { makeObservable, observable, action } from "mobx"
 import { login, getInfo } from '@/api/user'
+import { toast } from 'react-toastify'
 
 class LoginStore {
   visible = false
@@ -35,11 +36,13 @@ class LoginStore {
       localStorage.setItem("token", token),
       this.setUsername(username)
       this.setVisible(false)
+      toast.success('登录成功')
     }).finally(() => this.setLoading(false))
   }
   getInfo = () => {
     getInfo().then(res => {
-      console.log(res);
+      const { username } = res
+      this.setUsername(username)
     })
   }
 }

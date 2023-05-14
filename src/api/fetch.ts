@@ -1,5 +1,5 @@
 import queryString, { StringifiableRecord } from 'query-string'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 
 function getToken() {
   return localStorage.getItem('token')
@@ -21,8 +21,11 @@ export function useGetFetch<ResProp = any>(config: FetchProp) {
     if (status >= 200 && status < 300) {
       return res.json() as ResProp
     } else if (status === 401) {
-      toast('123')
+      if (!res.url.includes('/user/info')) {
+        toast.error('未登录~')
+      }
     } else {
+      toast.error('网络错误')
       return Promise.reject(res)
     }
   })
@@ -40,7 +43,9 @@ export function usePostFetch<ResProp = any>(config: FetchProp) {
   }).then(res => {
     const { status } = res
     if (status >= 200 && status < 300) {
-      return res.json() as ResProp
+      return res.json().catch(() => {
+        return res.statusText
+      })
     }
     return Promise.reject(res)
   })

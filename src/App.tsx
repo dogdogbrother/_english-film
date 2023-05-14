@@ -1,18 +1,19 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/home'
 import PlayVideo from './pages/play-video'
-import {Modal, Input, Button, useToasts } from '@geist-ui/core'
+import {Modal, Input, Button } from '@geist-ui/core'
 import { useState } from 'react'
 import { observer } from "mobx-react-lite"
 import loginStore from './store/login'
+import toastStore from './store/toast'
 import { ToastContainer, toast } from 'react-toastify';
 interface InputProp {
   value: string
   type?: 'error'
 }
 const App = observer(() => {
-  const {visible, setVisible, login } = loginStore
-  const { setToast } = useToasts()
+  const {visible, setVisible, login, loading } = loginStore
+  const { binds } = toastStore
   const [username, setUsername] = useState<InputProp>({
     value: '',
     type: undefined,
@@ -29,10 +30,7 @@ const App = observer(() => {
       setPassword({...password, type: 'error'})
     }
     if (username.value.length < 4 || password.value.length < 4) {
-      return setToast({
-        text: '用户名或密码长度不能小于4个字符',
-        type: 'error',
-      })
+      toast.error('用户名或密码长度不能小于4个字符')
     }
     login({username: username.value, password: password.value})
   }
@@ -42,13 +40,9 @@ const App = observer(() => {
   function inputPassword(e: any) {
     setPassword({...password, value: e.target.value, type: e.target.value.length < 4 ? 'error' : undefined})
   }
-  function test() {
-    toast("Wow so easy!");
-  }
   return (
     <div className="App">
-      <div onClick={test}>123</div>
-      <ToastContainer />
+      <ToastContainer {...binds} />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />}></Route>
@@ -60,7 +54,7 @@ const App = observer(() => {
           <Input width="100%" type={username.type} placeholder='请输入用户名' css={{marginBottom: '20px', display: 'block'}} onChange={inputUsername} />
           <Input.Password  type={username.type} placeholder='请输入密码' css={{marginBottom: '10px'}} onChange={inputPassword} />
           <p css={{fontSize: '12px', color: '#888', marginBottom: '10px'}}>初次登录即为注册</p>
-          <Button type="secondary" ghost width="100%" onClick={handleLogin}>登录</Button>
+          <Button loading={loading} type="secondary" ghost width="100%" onClick={handleLogin}>登录</Button>
         </div>
       </Modal>
     </div>
