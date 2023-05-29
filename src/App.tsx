@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { observer } from "mobx-react-lite"
 import loginStore from './store/login'
 import toastStore from './store/toast'
+import translateModal from './store/translate-modal'
 import { ToastContainer, toast } from 'react-toastify';
 interface InputProp {
   value: string
@@ -13,6 +14,8 @@ interface InputProp {
 }
 const App = observer(() => {
   const {visible, setVisible, login, loading } = loginStore
+  const { Modal: TranslateModal, visible: _translateModalVisible, loading: _loading } = translateModal
+
   const { binds } = toastStore
   const [username, setUsername] = useState<InputProp>({
     value: '',
@@ -57,6 +60,7 @@ const App = observer(() => {
           <Button loading={loading} type="secondary" ghost width="100%" onClick={handleLogin}>登录</Button>
         </div>
       </Modal>
+      <TranslateModal />
     </div>
   )
 }) 

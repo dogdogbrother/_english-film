@@ -1,6 +1,7 @@
 import { makeObservable, observable, action } from "mobx"
 import { login, getInfo } from '@/api/user'
 import { toast } from 'react-toastify'
+import { Modal } from '@geist-ui/core'
 
 class LoginStore {
   visible = false

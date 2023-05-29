@@ -9,7 +9,7 @@ export function getWordTranslate(word: string) {
 interface AddCollectProp {
   word: string
   filmId: string
-  keyWord: string
+  // keyWord: string
 }
 export function addCollect(data: AddCollectProp) {
   return usePostFetch({

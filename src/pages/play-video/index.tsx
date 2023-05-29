@@ -1,15 +1,17 @@
-import { useEffect, useState, useReducer } from 'react'
+import { useEffect, useState, useReducer, useRef } from 'react'
 import videojs from 'video.js'
 import zhLang from 'video.js/dist/lang/zh-CN.json'
 import { Play } from '@icon-park/react'
 import { caption } from '../../../public/TheTrumanShow/caption'
-import { Select, Popover } from '@geist-ui/core'
+import { Select } from '@geist-ui/core'
 import Player from 'video.js/dist/types/player'
-import { useTranslate } from './components/translate-card'
+import { observer } from "mobx-react-lite"
+import translateModal from '@/store/translate-modal'
 
 videojs.addLanguage('zh-CN', zhLang)
 
-export default function PlayVideo() {
+const PlayVideo = observer(() => {
+  const { setVisible, visible, close, loading: _loading } = translateModal
   const [ playState, setPlayState ] = useState(false)
   const [ player, setPlayer ] = useState<Player | undefined>()
   const [ currentTime, setCurrentTime ] = useState(0)
@@ -19,15 +21,12 @@ export default function PlayVideo() {
     playbackRate: '1', // 倍速播放 0.25 0.5 0.75 1 1.25 1.5
     captionSize: '1', // 字幕大小 0.5 1 1.5 
   })
-  const { ContentCard, fetchTranslate } = useTranslate(playState)
   interface CaptionProp {
     origin: string
     translate: string
     originList: string[]
-    popVisibleList: boolean[]
   }
-  const [ currentCaption, setCurrentCaption ] = useState<CaptionProp>()
-
+  const currentCaption = useRef<CaptionProp>()
   interface WindowSizeProp {
     viodeHeight?: number
     viodeWidth?: number
@@ -56,7 +55,6 @@ export default function PlayVideo() {
       sizeRes.x = 0
       sizeRes.vWidth = innerWidth
     }
-    
     // 代表左右有黑边
     if (viodeAspectRatio < windowAspectRatio) {
       sizeRes.horizontal = true
@@ -92,7 +90,6 @@ export default function PlayVideo() {
     }
   }, [currentTime])
   
-
   useEffect(() => {
     if (!player) return
     registerVideoEvent(player)
@@ -102,9 +99,12 @@ export default function PlayVideo() {
     return () => {
       window.removeEventListener('keydown', keydown);
     }
-  }, [player, playState])
+  }, [player, playState, visible])
   function keydown(e: any) {
     if (e.keyCode === 32) {
+      if (visible) {
+        return close()
+      }
       if (playState) {
         player!.pause() 
       } else {
@@ -154,58 +154,31 @@ export default function PlayVideo() {
       const [ _key, value ] = find
       const { origin, translate } = value
       const originList = origin.split(' ')
-      const popVisibleList = originList.map(() => false)
-      setCurrentCaption({
+      currentCaption.current = {
         origin,
         translate,
-        originList,
-        popVisibleList
-      })
-    } else setCurrentCaption(undefined)
+        originList
+      }
+    } else currentCaption.current = undefined
   }
+  // 展示英文短剧
   function getEnglish() {
-    if (currentCaption?.originList) {
-      return currentCaption.originList.map((word, index) => 
-        <Popover content={<ContentCard /> as any} visible={currentCaption.popVisibleList[index]} onVisibleChange={handlePop(index)} placement="top" key={index}>
-          <span onClick={handleWord(word, index)}>{ word }</span>
-        </Popover>
+    if (currentCaption.current?.originList) {
+      return currentCaption.current?.originList.map((word, index) => 
+        <span data-word={word} key={index} onClick={() => handleWord(word)}>{ word }</span>
       )
     }
   }
+  // 展示翻译过后的中文
   function getTranslate() {
-    const find = Object.entries(caption).find(([key]) => {
-      const [ startTime, endTime ] = key.split('-')
-      return Number(startTime) <= currentTime && Number(endTime) >= currentTime
-    })
-    if (find) {
-      const [ _key, value ] = find
-      const { translate } = value
-      return translate 
-    }
-    return null
-  }
-  const handlePop = (index: number) => (val: boolean) => {
-    if (currentCaption?.popVisibleList) {
-      const { popVisibleList } = currentCaption
-      const _popVisibleList = popVisibleList
-      _popVisibleList[index] = val
-      setCurrentCaption({
-        ...currentCaption,
-        popVisibleList: _popVisibleList
-      })
+    if (currentCaption.current?.originList) {
+      return currentCaption.current?.translate
     }
   }
   // 点击英文字幕
-  const handleWord = (word: string, index: number) => (e: any) => {
-    e.stopPropagation()
+  function handleWord(word: string) {
+    setVisible(word)
     player!.pause()
-    if (currentCaption?.popVisibleList) {
-      setCurrentCaption({
-        ...currentCaption,
-        popVisibleList: currentCaption.popVisibleList.map((_, itemIndex) => itemIndex === index)
-      })
-      fetchTranslate(word)
-    }
   }
   function handleCaptionType(captionType: string | string[]) {
     setControlPanel({
@@ -277,7 +250,8 @@ export default function PlayVideo() {
             '> *:last-child': {
               marginRight: 0
             },
-          }}>{ getEnglish() }</div>
+          }}
+          >{ getEnglish() }</div>
           :
           null
         }
@@ -334,8 +308,9 @@ export default function PlayVideo() {
             <Select.Option value="1.5">大字幕</Select.Option>
           </Select >
         </li>
-        <li>1</li>
       </ul>
     </div>
   )
-}
+})
+
+export default PlayVideo
