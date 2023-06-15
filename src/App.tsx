@@ -49,7 +49,7 @@ const App = observer(() => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />}></Route>
-          <Route path="/play-video" element={<PlayVideo />}></Route>
+          <Route path="/play-video/:fragmentId" element={<PlayVideo />}></Route>
         </Routes>
       </BrowserRouter>
       <Modal wrapClassName="login-dialog" visible={visible} onClose={() => setVisible(false)}>

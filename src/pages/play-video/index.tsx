@@ -2,7 +2,7 @@ import { useEffect, useState, useReducer, useRef } from 'react'
 import videojs from 'video.js'
 import zhLang from 'video.js/dist/lang/zh-CN.json'
 import { Play } from '@icon-park/react'
-import { caption } from '../../../public/TheTrumanShow/caption'
+// import { caption } from '../../../public/TheTrumanShow/caption'
 import { Select } from '@geist-ui/core'
 import Player from 'video.js/dist/types/player'
 import { observer } from "mobx-react-lite"
@@ -11,6 +11,9 @@ import translateModal from '@/store/translate-modal'
 videojs.addLanguage('zh-CN', zhLang)
 
 const PlayVideo = observer(() => {
+  useEffect(() => {
+
+  }, [])
   const { setVisible, visible, close, loading: _loading } = translateModal
   const [ playState, setPlayState ] = useState(false)
   const [ player, setPlayer ] = useState<Player | undefined>()
@@ -146,20 +149,20 @@ const PlayVideo = observer(() => {
     player!.pause()
   }
   function getEngSubtitle(_currentTime: number) {
-    const find = Object.entries(caption).find(([key]) => {
-      const [ startTime, endTime ] = key.split('-')
-      return Number(startTime) <= _currentTime && Number(endTime) >= _currentTime
-    })
-    if (find) {
-      const [ _key, value ] = find
-      const { origin, translate } = value
-      const originList = origin.split(' ')
-      currentCaption.current = {
-        origin,
-        translate,
-        originList
-      }
-    } else currentCaption.current = undefined
+    // const find = Object.entries(caption).find(([key]) => {
+    //   const [ startTime, endTime ] = key.split('-')
+    //   return Number(startTime) <= _currentTime && Number(endTime) >= _currentTime
+    // })
+    // if (find) {
+    //   const [ _key, value ] = find
+    //   const { origin, translate } = value
+    //   const originList = origin.split(' ')
+    //   currentCaption.current = {
+    //     origin,
+    //     translate,
+    //     originList
+    //   }
+    // } else currentCaption.current = undefined
   }
   // 展示英文短剧
   function getEnglish() {
