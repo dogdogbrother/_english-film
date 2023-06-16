@@ -43,7 +43,8 @@ class TranslateModalStore {
           marginBottom: '10px'
         }}>
           <h4 css={{fontSize: '22px'}}>{this.translate.word}</h4>
-          <Star 
+          <Star theme="filled" size="24" fill='red'/>
+          {/* <Star 
             onClick={() => onCollect(this.translate)} 
             css={{
               cursor: 'pointer', 
@@ -58,7 +59,7 @@ class TranslateModalStore {
             size="24" 
             fill="#333" 
             strokeWidth={2}
-          />
+          /> */}
         </div>
         <div css={{
           display: "flex",

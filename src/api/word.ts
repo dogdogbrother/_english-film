@@ -17,3 +17,9 @@ export function addCollect(data: AddCollectProp) {
     data
   })
 }
+
+export function getCollectList() {
+  return useGetFetch({
+    url: `/api/word/collect`
+  })
+}

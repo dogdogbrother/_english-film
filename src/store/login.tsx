@@ -1,12 +1,14 @@
 import { makeObservable, observable, action } from "mobx"
 import { login, getInfo } from '@/api/user'
+import { getCollectList as _getCollectList } from '@/api/word'
+
 import { toast } from 'react-toastify'
-import { Modal } from '@geist-ui/core'
 
 class LoginStore {
   visible = false
   loading = false
   username: string | undefined = undefined
+  collectList = []
   constructor() {
     if (!this.username) {
       this.getInfo()
@@ -15,10 +17,12 @@ class LoginStore {
       visible: observable,
       loading: observable,
       username: observable,
+      collectList: observable,
       setVisible: action,
       setLoading: action,
       login: action,
-      getInfo: action
+      getInfo: action,
+      getCollectList: action
     })
   }
   setVisible = (state: boolean) => {
@@ -38,12 +42,20 @@ class LoginStore {
       this.setUsername(username)
       this.setVisible(false)
       toast.success('登录成功')
+      // 登录成功了就去获取收藏的单纯列表
     }).finally(() => this.setLoading(false))
   }
   getInfo = () => {
     getInfo().then(res => {
       const { username } = res
       this.setUsername(username)
+      // 登录成功了就去获取收藏的单纯列表
+      this.getCollectList()
+    })
+  }
+  getCollectList = () => {
+    _getCollectList().then(res => {
+      console.log(res);
     })
   }
 }

@@ -7,7 +7,7 @@ import { observer } from "mobx-react-lite"
 import loginStore from './store/login'
 import toastStore from './store/toast'
 import translateModal from './store/translate-modal'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify'
 interface InputProp {
   value: string
   type?: 'error'

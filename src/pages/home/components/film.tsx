@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 // import zhLang from 'video.js/dist/lang/zh-CN.json'
 import Player from 'video.js/dist/types/player'
 import { useNavigate } from 'react-router-dom'
-import { getFilmList, getFragmentist } from '@/api/films'
+import { getFilmList, getFragmentList } from '@/api/films'
 import type { FilmProp, FragmentProp } from '@/api/films'
 // videojs.addLanguage('zh-CN', zhLang)
 
@@ -21,7 +21,7 @@ export default function Film() {
   const player = useRef<Player>()
   const navigate = useNavigate()
   function openDrawer(filmId: string) {
-    getFragmentist(filmId).then(res => {
+    getFragmentList(filmId).then(res => {
       setFragmentList(res!)
     })
     setDrawerState(true)

@@ -2,17 +2,42 @@ import { useEffect, useState, useReducer, useRef } from 'react'
 import videojs from 'video.js'
 import zhLang from 'video.js/dist/lang/zh-CN.json'
 import { Play } from '@icon-park/react'
-// import { caption } from '../../../public/TheTrumanShow/caption'
 import { Select } from '@geist-ui/core'
 import Player from 'video.js/dist/types/player'
 import { observer } from "mobx-react-lite"
 import translateModal from '@/store/translate-modal'
+import { useParams } from 'react-router-dom'
+import { getFragmentInfo, getCaption } from '@/api/films'
+import type { CaptionProp } from '@/api/films'
 
 videojs.addLanguage('zh-CN', zhLang)
 
 const PlayVideo = observer(() => {
+  const _player = useRef<Player>()
+  const { fragmentId } = useParams()
+  const [ captions, setCaptions ] = useState<CaptionProp[]>([])
   useEffect(() => {
-
+    getFragmentInfo(fragmentId!).then(res => {
+      console.log(res);
+      _player.current = videojs('video-play', {
+        autoPlay: true,
+        controlBar: { children: [] },
+        techOrder: ['html5'],
+        sources: [
+          {src: res?.fragmentUrl}
+        ]
+      })
+      setPlayer(_player.current)
+      window.addEventListener('resize', resizeUpdate);
+    })
+    getCaption(fragmentId!).then(res => {
+      setCaptions(res!)
+    })
+    return () => {
+      _player.current!.dispose();
+      window.removeEventListener('resize', resizeUpdate);
+      window.removeEventListener('keydown', keydown);
+    }
   }, [])
   const { setVisible, visible, close, loading: _loading } = translateModal
   const [ playState, setPlayState ] = useState(false)
@@ -24,12 +49,7 @@ const PlayVideo = observer(() => {
     playbackRate: '1', // 倍速播放 0.25 0.5 0.75 1 1.25 1.5
     captionSize: '1', // 字幕大小 0.5 1 1.5 
   })
-  interface CaptionProp {
-    origin: string
-    translate: string
-    originList: string[]
-  }
-  const currentCaption = useRef<CaptionProp>()
+  // const currentCaption = useRef<CaptionProp>()
   interface WindowSizeProp {
     viodeHeight?: number
     viodeWidth?: number
@@ -70,28 +90,6 @@ const PlayVideo = observer(() => {
     }
     return sizeRes
   }, {})
-  useEffect(() => {
-    const _player: Player = videojs('video-play', {
-      autoPlay: true,
-      controlBar: { children: [] },
-      techOrder: ['html5'],
-      sources: [
-        {src: '/TheTrumanShow/index.m3u8'}
-      ]
-    })
-    setPlayer(_player)
-    window.addEventListener('resize', resizeUpdate);
-    return () => {
-      _player.dispose();
-      window.removeEventListener('resize', resizeUpdate);
-      window.removeEventListener('keydown', keydown);
-    }
-  }, [])
-  useEffect(() => {
-    if (currentTime !== 0) {
-      getEngSubtitle(currentTime)
-    }
-  }, [currentTime])
   
   useEffect(() => {
     if (!player) return
@@ -148,36 +146,33 @@ const PlayVideo = observer(() => {
   function pause() {
     player!.pause()
   }
-  function getEngSubtitle(_currentTime: number) {
-    // const find = Object.entries(caption).find(([key]) => {
-    //   const [ startTime, endTime ] = key.split('-')
-    //   return Number(startTime) <= _currentTime && Number(endTime) >= _currentTime
-    // })
-    // if (find) {
-    //   const [ _key, value ] = find
-    //   const { origin, translate } = value
-    //   const originList = origin.split(' ')
-    //   currentCaption.current = {
-    //     origin,
-    //     translate,
-    //     originList
-    //   }
-    // } else currentCaption.current = undefined
-  }
   // 展示英文短剧
   function getEnglish() {
-    if (currentCaption.current?.originList) {
-      return currentCaption.current?.originList.map((word, index) => 
-        <span data-word={word} key={index} onClick={() => handleWord(word)}>{ word }</span>
-      )
-    }
+    const currentCaption = getCurrentCaption()
+    if (currentCaption) {
+      return currentCaption.en.split(' ').filter(item => item).map((word, index) => {
+        return <span data-word={word} key={index} onClick={() => handleWord(word)}>{ word }</span>
+      })
+    } else return undefined
   }
+
+  // 获取到当前时间下的字幕对象
+  function getCurrentCaption() {
+    const _currentTime = currentTime * 1000
+    return captions.find(caption => {
+      const { start, end } = caption
+      return _currentTime >= start && _currentTime <= end
+    })
+  }
+
   // 展示翻译过后的中文
   function getTranslate() {
-    if (currentCaption.current?.originList) {
-      return currentCaption.current?.translate
-    }
+    const currentCaption = getCurrentCaption()
+    if (currentCaption) {
+      return currentCaption.cn
+    } else return undefined
   }
+
   // 点击英文字幕
   function handleWord(word: string) {
     setVisible(word)
