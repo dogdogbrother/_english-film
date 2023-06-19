@@ -6,15 +6,17 @@ import Player from 'video.js/dist/types/player'
 import { useNavigate } from 'react-router-dom'
 import { getFilmList, getFragmentList } from '@/api/films'
 import type { FilmProp, FragmentProp } from '@/api/films'
+import loginStore from '@/store/login'
+
 // videojs.addLanguage('zh-CN', zhLang)
 
 export default function Film() {
   useEffect(() => {
     getFilmList().then((res) => {
-      console.log(res);
       setFilmList(res!)
     })
   }, [])
+  const { collectList } = loginStore
   const [drawerState, setDrawerState] = useState(false)
   const [filmList, setFilmList] = useState<FilmProp[]>([])
   const [fragmentList, setFragmentList] = useState<FragmentProp[]>([])
@@ -25,18 +27,6 @@ export default function Film() {
       setFragmentList(res!)
     })
     setDrawerState(true)
-    // if (player.current) return
-    // setTimeout(() => {
-    //   // player.current = videojs('video-1', {
-    //   //   autoPlay: true,
-    //   //   controlBar: { children: [] },
-    //   //   techOrder: ['html5'],
-    //   //   width: 280,
-    //   //   sources: [
-    //   //     {src: '/TheTrumanShow/index.m3u8'}
-    //   //   ]
-    //   // })
-    // }, 500)
   }
   function closeDrawer() {
     setDrawerState(false)
@@ -52,7 +42,8 @@ export default function Film() {
       {
         filmList.map(film => <li key={film.id} onClick={() => openDrawer(film.id)} css={{cursor: 'pointer'}}>
           <Image width='200px' height='200px' src={film.filmCover} />
-          <h3>{film.filmName}</h3>
+          <h3 css={{textAlign: 'center'}}>{film.filmName}</h3>
+          <p>在这里你收藏了{collectList.filter(collect => collect.filmId === film.id).length}个单词</p>
         </li>)
       }
     </ul>

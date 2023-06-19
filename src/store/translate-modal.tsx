@@ -3,6 +3,7 @@ import { toast } from 'react-toastify'
 import { Modal, Loading } from '@geist-ui/core'
 import { getWordTranslate, addCollect } from '@/api/word'
 import { VolumeNotice, Star } from '@icon-park/react'
+import loginStore from './login'
 
 interface translateProp {
   translation: string
@@ -18,6 +19,7 @@ interface translateProp {
 class TranslateModalStore {
   visible = false
   loading = false
+  filmId: string | undefined = undefined
   translate: translateProp = {
     translation: '',
     speakUrl: '',
@@ -43,9 +45,9 @@ class TranslateModalStore {
           marginBottom: '10px'
         }}>
           <h4 css={{fontSize: '22px'}}>{this.translate.word}</h4>
-          <Star theme="filled" size="24" fill='red'/>
-          {/* <Star 
-            onClick={() => onCollect(this.translate)} 
+          {/* <Star theme="filled" size="24" fill='red'/> */}
+          <Star 
+            onClick={() => onCollect(this.translate, this.filmId!)} 
             css={{
               cursor: 'pointer', 
               transform: 'translateY(2px) scale(1)',
@@ -59,7 +61,7 @@ class TranslateModalStore {
             size="24" 
             fill="#333" 
             strokeWidth={2}
-          /> */}
+          />
         </div>
         <div css={{
           display: "flex",
@@ -108,8 +110,10 @@ class TranslateModalStore {
       visible: observable,
       loading: observable,
       Modal: observable,
+      filmId: observable,
       setVisible: action,
-      close: action
+      close: action,
+      setFilmId: action
     })
   }
   setVisible = async (word: string) => {
@@ -127,19 +131,22 @@ class TranslateModalStore {
     //   // 清除数据
     // }, 300)
   }
+  setFilmId = (filmId: string) => {
+    this.filmId = filmId
+  }
 }
 
 export default new TranslateModalStore()
 
-function onCollect(translate: translateProp) {
-  const { word } = translate
-  toast.success('收藏成功')
-  // addCollect({
-  //   word,
-  //   filmId: '1', // 虚假的电影id
-  // }).then(() => {
-  //   toast.success('收藏成功')
-  // })
+function onCollect(translate: translateProp, filmId: string) {
+  const { word, } = translate
+  addCollect({
+    word,
+    filmId,
+  }).then(() => {
+    toast.success('收藏成功')
+    loginStore.getCollectList()
+  })
 }
 
 // 发音

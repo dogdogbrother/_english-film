@@ -18,8 +18,13 @@ export function addCollect(data: AddCollectProp) {
   })
 }
 
+export interface CollectProp {
+  filmId: string
+  id: string
+  word: string
+}
 export function getCollectList() {
-  return useGetFetch({
+  return useGetFetch<CollectProp[]>({
     url: `/api/word/collect`
   })
 }

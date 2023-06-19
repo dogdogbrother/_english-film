@@ -6,9 +6,11 @@ import { Select } from '@geist-ui/core'
 import Player from 'video.js/dist/types/player'
 import { observer } from "mobx-react-lite"
 import translateModal from '@/store/translate-modal'
+import loginStore from '@/store/login'
 import { useParams } from 'react-router-dom'
 import { getFragmentInfo, getCaption } from '@/api/films'
 import type { CaptionProp } from '@/api/films'
+import { delSymbol } from '@/util/word'
 
 videojs.addLanguage('zh-CN', zhLang)
 
@@ -39,7 +41,9 @@ const PlayVideo = observer(() => {
       window.removeEventListener('keydown', keydown);
     }
   }, [])
-  const { setVisible, visible, close, loading: _loading } = translateModal
+  const { setVisible, visible, close, loading: _loading, setFilmId } = translateModal
+  const { collectList } = loginStore
+  setFilmId(fragmentId!)
   const [ playState, setPlayState ] = useState(false)
   const [ player, setPlayer ] = useState<Player | undefined>()
   const [ currentTime, setCurrentTime ] = useState(0)
@@ -151,7 +155,12 @@ const PlayVideo = observer(() => {
     const currentCaption = getCurrentCaption()
     if (currentCaption) {
       return currentCaption.en.split(' ').filter(item => item).map((word, index) => {
-        return <span data-word={word} key={index} onClick={() => handleWord(word)}>{ word }</span>
+        return <span 
+          css={{color: collectList.find(collect => delSymbol(collect.word) === delSymbol(word)) ? 'red' : undefined}}
+          data-word={word} 
+          key={index} 
+          onClick={() => handleWord(word)}
+        >{ word }</span>
       })
     } else return undefined
   }
@@ -175,7 +184,7 @@ const PlayVideo = observer(() => {
 
   // 点击英文字幕
   function handleWord(word: string) {
-    setVisible(word)
+    setVisible(delSymbol(word))
     player!.pause()
   }
   function handleCaptionType(captionType: string | string[]) {

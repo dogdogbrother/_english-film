@@ -1,6 +1,6 @@
 import { makeObservable, observable, action } from "mobx"
 import { login, getInfo } from '@/api/user'
-import { getCollectList as _getCollectList } from '@/api/word'
+import { CollectProp, getCollectList as _getCollectList } from '@/api/word'
 
 import { toast } from 'react-toastify'
 
@@ -8,7 +8,7 @@ class LoginStore {
   visible = false
   loading = false
   username: string | undefined = undefined
-  collectList = []
+  collectList: CollectProp[] = []
   constructor() {
     if (!this.username) {
       this.getInfo()
@@ -55,7 +55,7 @@ class LoginStore {
   }
   getCollectList = () => {
     _getCollectList().then(res => {
-      console.log(res);
+      this.collectList = res!
     })
   }
 }
