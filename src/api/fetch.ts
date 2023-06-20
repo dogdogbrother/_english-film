@@ -23,7 +23,10 @@ export function useGetFetch<ResProp = any>(config: FetchProp) {
     } else if (status === 401) {
       if (!res.url.includes('/user/info')) {
         toast.error('未登录~')
+      } else {
+        toast.error('需要登录~')
       }
+      return Promise.reject(res)
     } else {
       toast.error('网络错误')
       return Promise.reject(res)
